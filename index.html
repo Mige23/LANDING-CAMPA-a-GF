@@ -278,6 +278,7 @@
       <input type="hidden" name="_cc" value="phenix23michel@gmail.com" />
       <input type="hidden" name="_template" value="table" />
       <input type="hidden" name="_captcha" value="false" />
+      <input type="hidden" name="_next" value="/gracias.html" />
       <div class="field">
         <label for="nombre">Tu nombre</label>
         <input id="nombre" name="nombre" type="text" placeholder="Ej. Ana García" required />
@@ -324,16 +325,6 @@
 <div class="sticky-mobile-cta">
   <a href="#demo" class="btn btn-primary btn-block">Quiero mi demo gratis</a>
 </div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var form = document.getElementById('demoForm');
-    if (!form || typeof fbq !== 'function') return;
-    form.addEventListener('submit', function() {
-      fbq('track', 'Lead');
-    });
-  });
-</script>
 
 </body>
 </html>
