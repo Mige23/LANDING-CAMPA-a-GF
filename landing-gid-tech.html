@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GID TECH  — Controlá la asistencia de tu equipo en tiempo real</title>
+  <meta name="description" content="GID Asistencia Inteligente: controlá quién llegó, dónde está y qué hizo tu equipo, con foto y GPS. Probá gratis sin tarjeta de crédito." />
+
+  <!-- META PIXEL — reemplazá XXXXXXXXXXXX con tu Pixel ID real -->
+  <!--
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', 'XXXXXXXXXXXX');
+    fbq('track', 'PageView');
+  </script>
+  -->
+
+  <style>
+    :root {
+      --azul:       #E85D00;
+      --azul-claro: #FF7A1A;
+      --azul-bg:    #FFF3E8;
+      --verde:      #C44D00;
+      --verde-claro:#FF6600;
+      --gris-bg:    #FFF8F3;
+      --gris-borde: #FFD9B8;
+      --texto:      #1A0A00;
+      --texto-suave:#6B3A1F;
+      --blanco:     #FFFFFF;
+      --naranja:    #FF6600;
+      --naranja-oscuro: #CC4E00;
+      --naranja-claro:  #FF8533;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: var(--texto);
+      background: var(--blanco);
+      line-height: 1.6;
+    }
+
+    /* ─── BARRA NAV ─── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--blanco);
+      border-bottom: 1px solid var(--gris-borde);
+      padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { font-size: 1.4rem; font-weight: 900; color: var(--naranja); letter-spacing: -1px; }
+    .nav-logo span { color: var(--naranja-oscuro); font-size: 1rem; letter-spacing: 2px; font-weight: 700; }
+    .nav-cta {
+      background: var(--naranja); color: #fff;
+      padding: 10px 22px; border-radius: 8px;
+      font-size: 14px; font-weight: 700;
+      text-decoration: none; transition: background .2s;
+      white-space: nowrap;
+    }
+    .nav-cta:hover { background: var(--naranja-claro); }
+
+    /* ─── HERO ─── */
+    .hero {
+      background: linear-gradient(135deg, #1A0500 0%, #FF6600 100%);
+      color: #fff;
+      padding: 80px 24px 60px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      backdrop-filter: blur(4px);
+      padding: 5px 16px; border-radius: 20px;
+      font-size: 13px; font-weight: 600; margin-bottom: 24px;
+      letter-spacing: .5px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      max-width: 780px;
+      margin-left: auto; margin-right: auto;
+    }
+    .hero h1 em { color: #FFD0A8; font-style: normal; }
+    .hero p {
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      color: #CBD5E1;
+      max-width: 600px;
+      margin: 0 auto 36px;
+    }
+    .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: #fff; color: var(--naranja);
+      padding: 16px 32px; border-radius: 10px;
+      font-size: 16px; font-weight: 800;
+      text-decoration: none; transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+    .btn-secondary {
+      background: transparent; color: #fff;
+      border: 2px solid rgba(255,255,255,0.4);
+      padding: 14px 28px; border-radius: 10px;
+      font-size: 16px; font-weight: 600;
+      text-decoration: none; transition: border-color .2s;
+    }
+    .btn-secondary:hover { border-color: #fff; }
+    .hero-nota { margin-top: 16px; font-size: 13px; color: #94A3B8; }
+
+    /* ─── LOGOS / PRUEBA SOCIAL ─── */
+    .social-strip {
+      background: var(--gris-bg);
+      border-top: 1px solid var(--gris-borde);
+      border-bottom: 1px solid var(--gris-borde);
+      padding: 20px 24px;
+      text-align: center;
+    }
+    .social-strip p { font-size: 13px; color: var(--texto-suave); margin-bottom: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; }
+    .logos { display: flex; gap: 32px; justify-content: center; align-items: center; flex-wrap: wrap; }
+    .logo-pill {
+      background: #fff; border: 1px solid var(--gris-borde);
+      border-radius: 8px; padding: 8px 20px;
+      font-size: 14px; font-weight: 700; color: var(--texto-suave);
+    }
+
+    /* ─── PROBLEMA / DOLOR ─── */
+    .problema {
+      padding: 72px 24px;
+      max-width: 900px; margin: 0 auto;
+      text-align: center;
+    }
+    .seccion-label {
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.2px;
+      color: var(--naranja); margin-bottom: 12px;
+    }
+    .seccion-titulo {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 900; line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .seccion-subtitulo {
+      font-size: 1.05rem; color: var(--texto-suave);
+      max-width: 640px; margin: 0 auto 40px;
+    }
+    .dolor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px; text-align: left;
+    }
+    .dolor-card {
+      background: #FFF5EE;
+      border: 1px solid #FFD0A8;
+      border-radius: 12px; padding: 20px;
+    }
+    .dolor-card .emoji { font-size: 1.6rem; margin-bottom: 8px; }
+    .dolor-card h4 { font-weight: 700; font-size: 15px; margin-bottom: 6px; color: #8B3000; }
+    .dolor-card p { font-size: 13px; color: #6B3A1F; }
+
+    /* ─── SOLUCIÓN / PRODUCTO ─── */
+    .solucion {
+      background: var(--gris-bg);
+      padding: 72px 24px;
+    }
+    .solucion-inner { max-width: 1060px; margin: 0 auto; }
+    .solucion-intro { text-align: center; margin-bottom: 48px; }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--blanco);
+      border: 1px solid var(--gris-borde);
+      border-radius: 14px; padding: 24px;
+      transition: box-shadow .2s;
+    }
+    .feature-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: var(--azul-bg); border: 1px solid #FFD0A8; display: flex;
+      align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 14px;
+    }
+    .feature-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p  { font-size: 14px; color: var(--texto-suave); }
+
+    /* ─── CÓMO FUNCIONA ─── */
+    .como {
+      padding: 72px 24px;
+      max-width: 860px; margin: 0 auto;
+    }
+    .como-intro { text-align: center; margin-bottom: 48px; }
+    .pasos { display: flex; flex-direction: column; gap: 0; }
+    .paso {
+      display: flex; gap: 20px; padding: 24px 0;
+      border-bottom: 1px solid var(--gris-borde);
+    }
+    .paso:last-child { border-bottom: none; }
+    .paso-num {
+      font-size: 2rem; font-weight: 900;
+      color: var(--naranja); min-width: 48px; line-height: 1;
+    }
+    .paso h4 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+    .paso p  { font-size: 14px; color: var(--texto-suave); }
+
+    /* ─── TESTIMONIOS ─── */
+    .testimonios {
+      background: linear-gradient(135deg, #1A0500, #CC4E00);
+      padding: 72px 24px; color: #fff;
+    }
+    .testimonios-inner { max-width: 1060px; margin: 0 auto; text-align: center; }
+    .testimonios h2 { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 900; margin-bottom: 8px; }
+    .testimonios .sub { color: #FFD0A8; margin-bottom: 40px; }
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px; text-align: left;
+    }
+    .testi-card {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px; padding: 24px;
+    }
+    .testi-card .stars { color: #FCD34D; font-size: 1rem; margin-bottom: 12px; }
+    .testi-card blockquote { font-size: 14px; line-height: 1.7; color: #FFE8D6; margin-bottom: 16px; }
+    .testi-autor { font-size: 13px; font-weight: 700; }
+    .testi-rol   { font-size: 12px; color: #FFD0A8; }
+
+    /* PLACEHOLDER TESTIMONIOS */
+    .testi-placeholder {
+      background: rgba(255,255,255,0.06);
+      border: 1px dashed rgba(255,255,255,0.2);
+      border-radius: 14px; padding: 24px;
+      text-align: center; color: #FFD0A8; font-size: 13px;
+    }
+    .testi-placeholder p { margin-bottom: 8px; }
+    .testi-placeholder strong { color: #fff; }
+
+    /* ─── MÉTRICAS ─── */
+    .metricas {
+      padding: 60px 24px;
+      background: linear-gradient(135deg, #1A0500, #CC4E00);
+      color: #fff;
+    }
+    .metricas-inner {
+      max-width: 900px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 24px; text-align: center;
+    }
+    .metrica-num { font-size: 2.6rem; font-weight: 900; color: #fff; }
+    .metrica-label { font-size: 14px; color: #FFD0A8; }
+
+    /* ─── FAQ ─── */
+    .faq {
+      padding: 72px 24px;
+      max-width: 760px; margin: 0 auto;
+    }
+    .faq-intro { text-align: center; margin-bottom: 40px; }
+    details {
+      border: 1px solid var(--gris-borde);
+      border-radius: 10px; margin-bottom: 10px;
+      overflow: hidden;
+    }
+    summary {
+      padding: 16px 20px;
+      font-weight: 700; font-size: 15px;
+      cursor: pointer; list-style: none;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    summary::after { content: '+'; font-size: 1.4rem; color: var(--naranja); }
+    details[open] summary::after { content: '−'; }
+    details p { padding: 0 20px 16px; font-size: 14px; color: var(--texto-suave); }
+
+    /* ─── CTA FINAL ─── */
+    .cta-final {
+      background: linear-gradient(135deg, #CC4E00, #FF6600);
+      padding: 80px 24px;
+      text-align: center; color: #fff;
+    }
+    .cta-final h2 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 900; margin-bottom: 16px;
+    }
+    .cta-final p { font-size: 1.05rem; color: #FFE0C4; margin-bottom: 36px; max-width: 560px; margin-left: auto; margin-right: auto; }
+    .cta-final .btn-primary { font-size: 18px; padding: 18px 40px; }
+
+    /* ─── FORMULARIO ─── */
+    .form-section {
+      padding: 72px 24px;
+      background: var(--blanco);
+    }
+    .form-inner {
+      max-width: 560px; margin: 0 auto;
+      background: var(--gris-bg); border: 1px solid var(--gris-borde);
+      border-radius: 18px; padding: 40px;
+    }
+    .form-inner h2 { font-size: 1.5rem; font-weight: 900; margin-bottom: 8px; text-align: center; }
+    .form-inner .form-sub { font-size: 14px; color: var(--texto-suave); text-align: center; margin-bottom: 28px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 12px 14px;
+      border: 1px solid var(--gris-borde); border-radius: 8px;
+      font-size: 15px; background: #fff;
+      transition: border-color .2s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      outline: none; border-color: var(--naranja);
+      box-shadow: 0 0 0 3px rgba(255,102,0,.15);
+    }
+    .form-submit {
+      width: 100%; padding: 16px;
+      background: var(--naranja); color: #fff;
+      border: none; border-radius: 10px;
+      font-size: 16px; font-weight: 800;
+      cursor: pointer; transition: background .2s;
+      margin-top: 8px;
+    }
+    .form-submit:hover { background: var(--naranja-claro); }
+    .form-privacy { font-size: 11px; color: var(--texto-suave); text-align: center; margin-top: 12px; }
+    .form-garantia {
+      display: flex; gap: 10px; align-items: flex-start;
+      background: #F0FDF4; border: 1px solid #BBF7D0;
+      border-radius: 10px; padding: 14px; margin-bottom: 20px;
+      font-size: 13px; color: #166534;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #1A0500; color: #A0694A;
+      padding: 32px 24px; text-align: center;
+      font-size: 13px;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    footer strong { color: #FFD0A8; }
+    footer a { color: #A0694A; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 600px) {
+      .hero { padding: 60px 20px 48px; }
+      .hero h1 { font-size: 1.8rem; }
+      nav .nav-cta { font-size: 13px; padding: 9px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">GID<span>TECH</span></div>
+  <a href="#probá" class="nav-cta">Probá gratis</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">🇦🇷 Gestión de equipos para empresas argentinas</div>
+  <h1>Sabé en tiempo real si tu equipo <em>llegó, dónde está y qué hizo</em> — sin llamar a nadie</h1>
+  <p>GID Asistencia Inteligente registra la asistencia de tus empleados con foto y GPS desde el celular. Sin papeles, sin excusas, sin sorpresas al final del mes.</p>
+  <div class="hero-btns">
+    <a href="#probá" class="btn-primary">🚀 Empezar prueba gratis</a>
+    <a href="#como-funciona" class="btn-secondary">Ver cómo funciona</a>
+  </div>
+  <p class="hero-nota">✅ Sin tarjeta de crédito &nbsp;·&nbsp; ✅ Configuración en 10 minutos &nbsp;·&nbsp; ✅ Soporte en español</p>
+</section>
+
+<!-- SOCIAL PROOF STRIP -->
+
+<!-- PROBLEMA -->
+<section class="problema">
+  <p class="seccion-label">El problema que resolvemos</p>
+  <h2 class="seccion-titulo">¿Te suena familiar alguna de estas situaciones?</h2>
+  <p class="seccion-subtitulo">Si manejás un equipo de más de 3 personas, seguramente vivís alguno de estos dolores todos los días.</p>
+  <div class="dolor-grid">
+    <div class="dolor-card">
+      <div class="emoji">📋</div>
+      <h4>Planillas que nadie completa bien</h4>
+      <p>Los registros de asistencia en papel o Excel son un caos. Se pierden, se alteran, o directamente no se llenan.</p>
+    </div>
+    <div class="dolor-card">
+      <div class="emoji">📍</div>
+      <h4>"Ya voy" que no sabés si es verdad</h4>
+      <p>Tus empleados dicen que están en el lugar, pero no tenés forma de verificarlo sin llamarlos y generarte ese momento incómodo.</p>
+    </div>
+    <div class="dolor-card">
+      <div class="emoji">😤</div>
+      <h4>Fin de mes, asistencia mal calculada</h4>
+      <p>Horas extras que no cuadran, llegadas tarde que no se registraron, ausencias que nadie anotó. Un caos en RRHH.</p>
+    </div>
+    <div class="dolor-card">
+      <div class="emoji">🔍</div>
+      <h4>Sin evidencia de lo que se hizo</h4>
+      <p>No podés demostrarle a un cliente qué hizo tu equipo en campo. No tenés fotos, ni ubicación, ni timestamps.</p>
+    </div>
+    <div class="dolor-card">
+      <div class="emoji">🤦</div>
+      <h4>WhatsApp para todo</h4>
+      <p>"Llegué", "salí", "terminé" por mensajes que se pierden entre otros 200 mensajes del grupo de trabajo.</p>
+    </div>
+    <div class="dolor-card">
+      <div class="emoji">💸</div>
+      <h4>Pagás por horas que no se trabajaron</h4>
+      <p>Sin control real, pagás asistencia que no fue asistencia. Y encima no tenés prueba para disputarla.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUCIÓN -->
+<section class="solucion" id="como-funciona">
+  <div class="solucion-inner">
+    <div class="solucion-intro">
+      <p class="seccion-label">La solución</p>
+      <h2 class="seccion-titulo">GID hace todo esto por vos — desde el celular</h2>
+      <p class="seccion-subtitulo">Una app simple para tus empleados, un panel completo para vos. Sin servidores, sin instalación compleja, sin IT.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📷</div>
+        <h3>Registro con foto en el momento</h3>
+        <p>Cada vez que un empleado marca asistencia, la app saca una foto automáticamente. Sin foto, no hay registro válido.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📍</div>
+        <h3>GPS al segundo exacto</h3>
+        <p>Sabés exactamente dónde estaba tu empleado cuando registró su entrada o salida. Ubicación verificada, no declarada.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Registro en menos de 10 segundos</h3>
+        <p>Tu equipo abre la app, toca un botón, listo. No hay excusas para no usarlo porque es más rápido que mandar un WhatsApp.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Panel en tiempo real para vos</h3>
+        <p>Ves quién llegó, quién falta, quién llegó tarde y dónde está cada uno en este momento. Todo desde tu computadora o celular.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📑</div>
+        <h3>Reportes automáticos para RRHH</h3>
+        <p>Al final del mes, GID te da un reporte completo de asistencias, tardanzas y ausencias. Nada que calcular a mano.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✅</div>
+        <h3>Asignación y seguimiento de tareas</h3>
+        <p>Asignás tareas desde el panel, tu equipo las registra como completadas con evidencia fotográfica. Sabés qué se hizo y cuándo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CÓMO FUNCIONA (PASOS) -->
+<section class="como">
+  <div class="como-intro">
+    <p class="seccion-label">Cómo funciona</p>
+    <h2 class="seccion-titulo">Configurado en 10 minutos, funcionando desde el día 1</h2>
+  </div>
+  <div class="pasos">
+    <div class="paso">
+      <div class="paso-num">01</div>
+      <div>
+        <h4>Creás tu cuenta de empresa (gratis)</h4>
+        <p>Registrás tu empresa en menos de 2 minutos. Sin tarjeta, sin contrato, sin llamadas de ventas.</p>
+      </div>
+    </div>
+    <div class="paso">
+      <div class="paso-num">02</div>
+      <div>
+        <h4>Cargás a tus empleados</h4>
+        <p>Los invitás por email o link. Cada uno descarga la app de GID en su celular (iOS o Android) y se registra en 1 minuto.</p>
+      </div>
+    </div>
+    <div class="paso">
+      <div class="paso-num">03</div>
+      <div>
+        <h4>Tu equipo empieza a registrar asistencia</h4>
+        <p>Desde el primer día, cada vez que un empleado entra o sale, lo registra con foto y GPS en la app. Vos lo ves al instante en el panel.</p>
+      </div>
+    </div>
+    <div class="paso">
+      <div class="paso-num">04</div>
+      <div>
+        <h4>Tomás decisiones con datos reales</h4>
+        <p>Fin de mes: reportes automáticos, sin sorpresas, sin discusiones. Todos los registros están ahí, con foto y ubicación como evidencia.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- MÉTRICAS -->
+<section class="metricas">
+  <div class="metricas-inner">
+    <div>
+      <div class="metrica-num">10 min</div>
+      <div class="metrica-label">Tiempo de configuración inicial</div>
+    </div>
+    <div>
+      <div class="metrica-num">0</div>
+      <div class="metrica-label">Papeles o planillas que reemplaza</div>
+    </div>
+    <div>
+      <div class="metrica-num">100%</div>
+      <div class="metrica-label">Evidencia verificable de cada registro</div>
+    </div>
+    <div>
+      <div class="metrica-num">24/7</div>
+      <div class="metrica-label">Acceso al panel desde cualquier dispositivo</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="faq-intro">
+    <p class="seccion-label">Preguntas frecuentes</p>
+    <h2 class="seccion-titulo">Todo lo que necesitás saber antes de empezar</h2>
+  </div>
+  <details>
+    <summary>¿Necesito instalar algo en mi empresa o servidor?</summary>
+    <p>No. GID funciona 100% en la nube. Tus empleados solo necesitan descargar la app en su celular (disponible en Android e iOS). Vos accedés al panel desde cualquier navegador, sin instalar nada.</p>
+  </details>
+  <details>
+    <summary>¿Qué pasa si un empleado no tiene smartphone?</summary>
+    <p>GID está diseñado para equipos donde cada integrante tiene un celular. Si tenés empleados sin smartphone, podemos conversar opciones adaptadas a tu caso durante la prueba gratuita.</p>
+  </details>
+  <details>
+    <summary>¿Los empleados pueden falsear su ubicación?</summary>
+    <p>GID combina GPS con verificación fotográfica en el momento del registro. Si alguien intenta falsear la ubicación, el sistema lo detecta. Además, los registros quedan con timestamp verificado que no puede editarse a posteriori.</p>
+  </details>
+  <details>
+    <summary>¿Cuánto cuesta después de la prueba gratuita?</summary>
+    <p>Durante la prueba gratuita tenés acceso a todas las funcionalidades. Al terminar el trial, un asesor te contacta para armar el plan que mejor se adapte al tamaño de tu equipo. Sin compromisos, sin letra chica.</p>
+  </details>
+  <details>
+    <summary>¿Mis datos están seguros?</summary>
+    <p>Sí. GID está desarrollado con estándares de ciberseguridad. Los datos de tu empresa y tus empleados están encriptados y nunca se comparten con terceros.</p>
+  </details>
+  <details>
+    <summary>¿Lo puedo usar para empleados en campo o en múltiples sedes?</summary>
+    <p>Es exactamente para eso. GID está pensado para equipos que no trabajan en un lugar fijo: técnicos, vendedores, repartidores, personal de limpieza, seguridad, y cualquier empleado que se mueva durante su jornada.</p>
+  </details>
+</section>
+
+<!-- FORMULARIO / CTA -->
+<section class="form-section" id="probá">
+  <div class="form-inner">
+    <h2>Empezá tu prueba gratis hoy</h2>
+    <p class="form-sub">Sin tarjeta de crédito. Sin compromiso. Configurado en 10 minutos.</p>
+
+    <div class="form-garantia">
+      <span>🛡️</span>
+      <span><strong>Prueba gratuita completa:</strong> acceso a todas las funciones durante el período de prueba. Si no te convence, no pagás nada.</span>
+    </div>
+
+    <!-- REEMPLAZÁ este form con tu formulario real (Typeform, HubSpot, formulario propio, etc.) -->
+    <form onsubmit="handleSubmit(event)">
+      <div class="form-group">
+        <label for="nombre">Tu nombre</label>
+        <input type="text" id="nombre" name="nombre" placeholder="Juan Pérez" required />
+      </div>
+      <div class="form-group">
+        <label for="email">Email de trabajo</label>
+        <input type="email" id="email" name="email" placeholder="juan@tuempresa.com" required />
+      </div>
+      <div class="form-group">
+        <label for="telefono">WhatsApp (para que te contactemos)</label>
+        <input type="tel" id="telefono" name="telefono" placeholder="+54 9 11 1234-5678" />
+      </div>
+      <div class="form-group">
+        <label for="empleados">¿Cuántos empleados tiene tu empresa?</label>
+        <select id="empleados" name="empleados" required>
+          <option value="">Seleccioná una opción</option>
+          <option value="1-5">1 a 5 empleados</option>
+          <option value="6-20">6 a 20 empleados</option>
+          <option value="21-50">21 a 50 empleados</option>
+          <option value="51-100">51 a 100 empleados</option>
+          <option value="100+">Más de 100 empleados</option>
+        </select>
+      </div>
+      <button type="submit" class="form-submit">🚀 Empezar prueba gratis ahora</button>
+      <p class="form-privacy">Al registrarte aceptás nuestros Términos de servicio y Política de privacidad. No enviamos spam.</p>
+    </form>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final">
+  <h2>Tu equipo trabajó hoy. ¿Podés comprobarlo?</h2>
+  <p>Con GID, sí podés. Registros con foto y GPS, disponibles para siempre. Empezá gratis y controlá tu equipo desde hoy.</p>
+  <a href="#probá" class="btn-primary">Empezar gratis — sin tarjeta</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p><strong>GID Tech</strong> · GID Asistencia Inteligente · <a href="https://gid-tech.com">gid-tech.com</a></p>
+  <p style="margin-top:8px;">Desarrollado en Argentina 🇦🇷 · Soporte en español · Ciberseguridad y desarrollo a medida</p>
+</footer>
+
+<script>
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    const nombre    = document.getElementById('nombre').value.trim();
+    const email     = document.getElementById('email').value.trim();
+    const telefono  = document.getElementById('telefono').value.trim();
+    const empleados = document.getElementById('empleados').value;
+
+    const mensaje =
+      `Hola GID Tech 👋 Vi su landing y quiero info sobre la prueba gratis.\n\n` +
+      `*Nombre:* ${nombre}\n` +
+      `*Email:* ${email}\n` +
+      `*WhatsApp:* ${telefono || 'No indicado'}\n` +
+      `*Empleados:* ${empleados}`;
+
+    const url = `https://wa.me/543515330387?text=${encodeURIComponent(mensaje)}`;
+
+    // fbq('track', 'Lead');  // Descomentar cuando el Pixel esté instalado
+
+    window.open(url, '_blank');
+    e.target.reset();
+  }
+
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+</script>
+
+</body>
+</html>

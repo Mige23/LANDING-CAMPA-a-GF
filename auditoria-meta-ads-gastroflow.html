@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Auditoría Meta Ads — GastroFlow Solutions</title>
+<style>
+  :root {
+    --azul:    #1877F2;
+    --verde:   #22c55e;
+    --amarillo:#f59e0b;
+    --rojo:    #ef4444;
+    --gris-bg: #f4f6fa;
+    --gris-borde: #e2e8f0;
+    --texto:   #1e293b;
+    --texto-suave: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--gris-bg); color: var(--texto); line-height: 1.6; }
+
+  header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    color: #fff; padding: 48px 32px 36px;
+    text-align: center;
+  }
+  header .badge { display: inline-block; background: var(--azul); color:#fff; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:4px 14px; border-radius:20px; margin-bottom:16px; }
+  header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 8px; }
+  header p { font-size: 1rem; color: #94a3b8; }
+  header .meta { display:flex; gap:24px; justify-content:center; margin-top:20px; flex-wrap:wrap; }
+  header .meta span { font-size:13px; color:#cbd5e1; }
+  header .meta strong { color:#fff; }
+
+  .alert-banner { background:#fffbeb; border-bottom:1px solid #fde68a; padding:16px 32px; text-align:center; font-size:14px; color:#92400e; }
+  .alert-banner strong { color:#78350f; }
+
+  .score-bar { background:#fff; border-bottom:1px solid var(--gris-borde); padding:28px 32px; display:flex; align-items:center; gap:32px; flex-wrap:wrap; justify-content:center; }
+  .score-circle { width:110px; height:110px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-direction:column; font-size:2.4rem; font-weight:900; color:#fff; background: conic-gradient(#f59e0b 0% 58%, #f1f5f9 58% 100%); position:relative; }
+  .score-circle::after { content:''; position:absolute; width:80px; height:80px; border-radius:50%; background:#fff; }
+  .score-inner { position:relative; z-index:1; text-align:center; }
+  .score-inner span { font-size:2rem; font-weight:900; color:#f59e0b; }
+  .score-inner small { font-size:12px; color:var(--texto-suave); display:block; }
+  .score-labels { display:flex; gap:16px; flex-wrap:wrap; max-width:420px; }
+  .score-item { display:flex; align-items:center; gap:8px; font-size:14px; }
+  .score-item .dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+  .dot-rojo { background:var(--rojo); }
+  .dot-amarillo { background:var(--amarillo); }
+  .dot-verde { background:var(--verde); }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 20px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+  @media(max-width:700px){ .grid-2{grid-template-columns:1fr;} .grid-3{grid-template-columns:1fr;} }
+
+  .section-title { font-size:1.4rem; font-weight:800; margin: 40px 0 16px; display:flex; align-items:center; gap:10px; }
+  .section-sub { font-size:13px; color:var(--texto-suave); margin-bottom:20px; margin-top:-10px; }
+
+  .card { background: #fff; border-radius: 14px; border: 1px solid var(--gris-borde); padding: 24px; margin-bottom:20px; }
+  .card h2 { font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; display:flex; align-items:center; gap:8px; }
+  .card h3 { font-size:0.95rem; font-weight:700; margin-bottom:10px; }
+
+  .tag { display:inline-block; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:.8px; }
+  .tag-rojo    { background:#fee2e2; color:#b91c1c; }
+  .tag-amarillo{ background:#fef3c7; color:#92400e; }
+  .tag-verde   { background:#dcfce7; color:#15803d; }
+  .tag-azul    { background:#dbeafe; color:#1d4ed8; }
+
+  .hallazgo { border-left: 4px solid; border-radius: 0 8px 8px 0; padding: 14px 16px; margin-bottom: 12px; }
+  .hallazgo-rojo    { border-color: var(--rojo);    background: #fff5f5; }
+  .hallazgo-amarillo{ border-color: var(--amarillo); background: #fffbeb; }
+  .hallazgo-verde   { border-color: var(--verde);   background: #f0fdf4; }
+  .hallazgo .title  { font-weight: 700; font-size:14px; margin-bottom:4px; display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .hallazgo .desc   { font-size:13px; color:var(--texto-suave); }
+  .hallazgo .fix    { font-size:13px; margin-top:8px; background:#fff; border-radius:6px; padding:8px 10px; }
+  .hallazgo .fix strong { color:var(--azul); }
+
+  .area-score { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .bar-track { width:100%; height:8px; background:#eef1f6; border-radius:8px; overflow:hidden; margin-bottom:18px; }
+  .bar-fill { height:100%; border-radius:8px; }
+
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { text-align:left; padding:10px 8px; border-bottom:1px solid var(--gris-borde); }
+  th { font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--texto-suave); }
+  td.num { font-weight:700; }
+  .below { color:var(--rojo); }
+  .above { color:var(--verde); }
+
+  .rewrite-box { background:#f8fafc; border:1px dashed #cbd5e1; border-radius:10px; padding:14px 16px; margin-bottom:10px; font-size:13.5px; }
+  .rewrite-box .old { color:#94a3b8; text-decoration:line-through; font-size:12.5px; margin-bottom:4px; }
+  .rewrite-box .new { color:#0f172a; font-weight:600; }
+
+  .checklist-item { display:flex; gap:14px; align-items:flex-start; padding:14px 0; border-bottom:1px solid var(--gris-borde); }
+  .checklist-item:last-child { border-bottom:none; }
+  .checklist-num { width:26px; height:26px; border-radius:50%; background:var(--azul); color:#fff; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .checklist-body strong { display:block; font-size:14px; margin-bottom:2px; }
+  .checklist-body p { font-size:12.5px; color:var(--texto-suave); margin:0; }
+  .checklist-meta { margin-left:auto; display:flex; gap:8px; flex-shrink:0; }
+
+  .ad-card { border:1px solid var(--gris-borde); border-radius:12px; padding:20px; margin-bottom:18px; background:#fdfefe; }
+  .ad-card .angle { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.6px; color:var(--azul); margin-bottom:8px; }
+  .ad-card .hook { font-size:16px; font-weight:800; margin-bottom:10px; }
+  .ad-card .copy { font-size:13.5px; white-space:pre-line; margin-bottom:12px; color:#334155; }
+  .ad-field { display:grid; grid-template-columns:110px 1fr; gap:6px; font-size:13px; margin-bottom:6px; }
+  .ad-field b { color:var(--texto-suave); font-weight:600; }
+  .briefing { background:#eff6ff; border-radius:8px; padding:10px 12px; font-size:12.5px; margin-top:10px; color:#1e3a5f; }
+
+  footer { text-align:center; padding:30px; font-size:12px; color:var(--texto-suave); }
+
+  @media print {
+    body { background:#fff; }
+    .card { break-inside: avoid; border:1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">Auditoría Meta Ads + Landing Page</div>
+  <h1>GastroFlow Solutions</h1>
+  <p>gastroflowsolutions.com — SaaS de gestión para restaurantes (B2B)</p>
+  <div class="meta">
+    <span>Fecha: <strong>20 julio 2026</strong></span>
+    <span>Ads activos analizados: <strong>0</strong></span>
+    <span>Landing analizada: <strong>Sí</strong></span>
+  </div>
+</header>
+
+<div class="alert-banner">
+  ⚠️ <strong>No se encontró campaña activa en la Biblioteca de Meta.</strong> Aún no has lanzado anuncios de GastroFlow. Por eso esta auditoría se centra en dejar tu landing lista para convertir y te entrega un pack de anuncios listo para lanzar en cuanto actives la campaña.
+</div>
+
+<div class="score-bar">
+  <div class="score-circle"><div class="score-inner"><span>58</span><small>/100</small></div></div>
+  <div>
+    <h2 style="margin-bottom:6px;">Landing funcional — hay margen de mejora significativo antes de invertir en ads</h2>
+    <div class="score-labels">
+      <div class="score-item"><span class="dot dot-verde"></span> Estructura y claridad del producto: sólida</div>
+      <div class="score-item"><span class="dot dot-amarillo"></span> Persuasión y prueba social: débil</div>
+      <div class="score-item"><span class="dot dot-rojo"></span> Tracking y medición: inexistente</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="section-title">📋 Resumen ejecutivo</div>
+  <div class="card">
+    <p style="font-size:14px; margin-bottom:12px;">GastroFlow Solutions tiene una landing clara sobre <strong>qué</strong> es el producto (gestión de mesas, pedidos por QR y ventas en tiempo real para restaurantes), pero está escrita como un <strong>manual de producto para quien ya es cliente</strong>, no como una página de aterrizaje para captar restaurantes que no te conocen. Antes de invertir un euro en Meta Ads, esto va a costar caro: sin pixel instalado no podrás medir ni optimizar campañas, sin prueba social un dueño de restaurante escéptico no confía, y sin precio ni CTA de "quiero una demo" no hay una vía de conversión clara para tráfico frío.</p>
+    <p style="font-size:14px;">Con las correcciones de este informe, la landing queda lista para recibir tráfico pagado — y al final tienes 5 anuncios completos, listos para copiar y pegar en el Ads Manager.</p>
+  </div>
+
+  <div class="section-title">🎯 Anuncios activos encontrados</div>
+  <div class="card">
+    <div class="hallazgo hallazgo-rojo">
+      <div class="title">Ninguna campaña activa en la Biblioteca de Anuncios de Meta</div>
+      <div class="desc">Se buscó "GastroFlow" y "GastroFlow Solutions" en la Meta Ad Library (todos los países, todos los formatos) y no aparecen anuncios activos. Confirmado también por el usuario: la campaña todavía no está activada.</div>
+      <div class="fix"><strong>Recomendación →</strong> No actives la campaña todavía. Aplica primero las correcciones de landing de este informe (sección "Corrección de la landing" y "Checklist"), instala el Pixel, y después lanza con el pack de anuncios de la última sección. Lanzar ads hacia una landing sin tracking es tirar presupuesto a ciegas.</div>
+    </div>
+  </div>
+
+  <div class="section-title">🖥️ Auditoría de la landing page</div>
+  <div class="section-sub">gastroflowsolutions.com — análisis por área</div>
+
+  <div class="card">
+    <h3>Above the fold</h3>
+    <div class="area-score"><span>Puntuación</span><strong>60/100</strong></div>
+    <div class="bar-track"><div class="bar-fill" style="width:60%; background:var(--amarillo);"></div></div>
+    <div class="hallazgo hallazgo-verde">
+      <div class="title">El headline comunica bien la función del producto</div>
+      <div class="desc">"La solución completa para digitalizar tu restaurante. Gestiona mesas, pedidos y ventas en tiempo real." — se entiende qué hace el producto en 5 segundos.</div>
+    </div>
+    <div class="hallazgo hallazgo-amarillo">
+      <div class="title">Falta el beneficio de negocio, solo describe la característica</div>
+      <div class="desc">"Digitalizar tu restaurante" es una característica. Un dueño de restaurante no compra "digitalización", compra menos errores en comanda, mesas rotando más rápido y menos personal necesario en sala. El headline actual no responde "¿y qué gano yo?".</div>
+      <div class="fix"><strong>Corrección →</strong> "Atiende más mesas con menos personal. El sistema que digitaliza tu restaurante sin que tus clientes descarguen ninguna app."</div>
+    </div>
+    <div class="hallazgo hallazgo-rojo">
+      <div class="title">No hay CTA principal visible sin hacer scroll orientado a captación</div>
+      <div class="desc">Los botones detectados en el encabezado son "INGRESAR A LA APP" y "SOLICITAR ACCESO" — ambos hablan a alguien que ya conoce o ya tiene cuenta. Un visitante que llega desde un anuncio no sabe si debe hacer clic ahí o no.</div>
+      <div class="fix"><strong>Corrección →</strong> Para tráfico de ads, el CTA above the fold debe ser inequívoco para un desconocido: "Pide una demo gratis" o "Prueba GastroFlow 14 días gratis", separado visualmente de "Ya tengo cuenta" (que debe quedar como enlace secundario, no botón).</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Copy y estructura persuasiva</h3>
+    <div class="area-score"><span>Puntuación</span><strong>55/100</strong></div>
+    <div class="bar-track"><div class="bar-fill" style="width:55%; background:var(--amarillo);"></div></div>
+    <div class="hallazgo hallazgo-verde">
+      <div class="title">Las funcionalidades están bien desglosadas</div>
+      <div class="desc">Pedidos por QR, reportes de ventas, alertas en tiempo real y panel de control están listadas de forma clara, con nombres concretos (no genéricos).</div>
+    </div>
+    <div class="hallazgo hallazgo-rojo">
+      <div class="title">Todo el copy habla de características, ninguna de beneficio cuantificado</div>
+      <div class="desc">No hay ni una cifra de resultado: "reduce X% los errores de comanda", "ahorra X horas de cierre de caja", "aumenta X% la rotación de mesas". Para un dueño de restaurante, que compra con el bolsillo, esto es la mayor pérdida de conversión de la página.</div>
+      <div class="fix"><strong>Corrección →</strong> Convierte cada característica en beneficio + cifra. Ej: "Alertas en tiempo real" → "Cero pedidos olvidados: tu cocina recibe la comanda al instante, sin gritos ni tickets perdidos".</div>
+    </div>
+    <div class="hallazgo hallazgo-rojo">
+      <div class="title">No aborda ninguna objeción</div>
+      <div class="desc">Objeciones típicas de un dueño de restaurante ("¿mis camareros van a saber usarlo?", "¿qué pasa si se cae internet?", "¿cuánto cuesta y hay permanencia?", "¿funciona con mi TPV actual?") no aparecen respondidas en ningún punto de la página.</div>
+      <div class="fix"><strong>Corrección →</strong> Añade una sección de FAQ o "Preguntas antes de empezar" con 4-5 objeciones reales del sector respondidas en una frase cada una.</div>
+    </div>
+    <div class="hallazgo hallazgo-amarillo">
+      <div class="title">No sigue una estructura persuasiva clara (AIDA/PAS)</div>
+      <div class="desc">La página va directa a "cómo funciona" sin agitar antes el problema (comandas perdidas, mesas mal gestionadas, personal desbordado en hora punta). Sin esa fase de "Problema", el "Aquí está la solución" pierde fuerza.</div>
+      <div class="fix"><strong>Corrección →</strong> Antes de la sección de características, añade un bloque corto tipo PAS: "En hora punta, un pedido mal apuntado cuesta una mesa insatisfecha y un ticket perdido. GastroFlow elimina ese error."</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>CTA y conversión</h3>
+    <div class="area-score"><span>Puntuación</span><strong>50/100</strong></div>
+    <div class="bar-track"><div class="bar-fill" style="width:50%; background:var(--amarillo);"></div></div>
+    <div class="hallazgo hallazgo-amarillo">
+      <div class="title">Demasiados CTAs distintos compitiendo entre sí</div>
+      <div class="desc">Se detectan 4 CTAs diferentes: "INGRESAR A LA APP", "SOLICITAR ACCESO", "COMENZAR AHORA", "YA TENGO CUENTA". Para tráfico frío de ads lo ideal es un único CTA principal repetido 2-3 veces, no cuatro mensajes distintos.</div>
+      <div class="fix"><strong>Corrección →</strong> Un único CTA principal ("Pide tu demo gratis") repetido en el header, a media página y al final. "Ya tengo cuenta" / "Ingresar a la app" quedan como enlaces pequeños en el header, no botones compitiendo.</div>
+    </div>
+    <div class="hallazgo hallazgo-amarillo">
+      <div class="title">Los textos de botón son genéricos, no específicos de la acción</div>
+      <div class="desc">"Comenzar ahora" no dice qué pasa al hacer clic (¿es una compra? ¿un registro? ¿una llamada?). La ambigüedad reduce el clic en tráfico frío.</div>
+      <div class="fix"><strong>Corrección →</strong> "Comenzar ahora" → "Quiero mi demo gratis de 15 min" o "Probar GastroFlow gratis 14 días".</div>
+    </div>
+    <div class="hallazgo hallazgo-rojo">
+      <div class="title">No hay urgencia ni incentivo para actuar ya</div>
+      <div class="desc">No hay oferta de lanzamiento, plazas limitadas de onboarding, ni ningún motivo para pedir la demo hoy en vez de "más adelante".</div>
+      <div class="fix"><strong>Corrección →</strong> Si es viable: "Primeros 20 restaurantes: onboarding e integración con tu TPV gratis (valorado en 150€)".</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Prueba social</h3>
+    <div class="area-score"><span>Puntuación</span><strong>25/100</strong></div>
+    <div class="bar-track"><div class="bar-fill" style="width:25%; background:var(--rojo);"></div></div>
+    <div class="hallazgo hallazgo-rojo">
+      <div class="title">No hay testimonios, logos de clientes ni casos de éxito</div>
+      <div class="desc">La única mención de prueba social detectada es genérica ("cientos de restaurantes"), sin nombres, sin fotos, sin resultados concretos. Para un software B2B que pide confianza operativa (gestión de pedidos y ventas), esto es crítico.</div>
+      <div class="fix"><strong>Corrección →</strong> Añade mínimo 3 testimonios reales con nombre del restaurante, ciudad y una cifra ("Reducimos 30% los errores de comanda en la primera semana — Marta, La Taberna del Puerto"). Si aún no tienes clientes con caso documentado, usa datos de tus primeros usuarios beta o un contador real de restaurantes activos.</div>
+    </div>
+    <div class="hallazgo hallazgo-rojo">
+      <div class="title">Sin garantía ni reducción de riesgo</div>
+      <div class="desc">No hay prueba gratuita explícita, ni garantía de devolución, ni "cancela cuando quieras". Cambiar de sistema de gestión da miedo — nada en la página baja ese miedo.</div>
+      <div class="fix"><strong>Corrección →</strong> "Prueba 14 días gratis, sin tarjeta. Cancela cuando quieras."</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Aspectos técnicos</h3>
+    <div class="area-score"><span>Puntuación</span><strong>70/100</strong></div>
+    <div class="bar-track"><div class="bar-fill" style="width:70%; background:var(--amarillo);"></div></div>
+    <table>
+      <tr><th>Elemento</th><th>Estado</th></tr>
+      <tr><td>HTTPS</td><td><span class="tag tag-verde">✓ Correcto</span></td></tr>
+      <tr><td>Responsive / viewport móvil</td><td><span class="tag tag-verde">✓ Correcto</span></td></tr>
+      <tr><td>Facebook Pixel (fbq)</td><td><span class="tag tag-rojo">✗ No detectado</span></td></tr>
+      <tr><td>Google Analytics / GA4</td><td><span class="tag tag-rojo">✗ No detectado</span></td></tr>
+      <tr><td>Eventos de conversión</td><td><span class="tag tag-rojo">✗ No hay pixel, no hay eventos</span></td></tr>
+      <tr><td>Formulario de captación de leads</td><td><span class="tag tag-amarillo">△ No se identifica un formulario claro de "solicitar demo"</span></td></tr>
+    </table>
+    <div class="hallazgo hallazgo-rojo" style="margin-top:14px;">
+      <div class="title">Sin Facebook Pixel instalado — bloqueante para lanzar campaña</div>
+      <div class="desc">Sin pixel, Meta no puede optimizar la entrega hacia quienes tienen más probabilidad de convertir, no puedes medir coste por lead/demo, ni crear públicos de retargeting. Es la corrección técnica de mayor prioridad antes de gastar en ads.</div>
+      <div class="fix"><strong>Corrección →</strong> Instala el Meta Pixel en el `&lt;head&gt;` de todas las páginas y configura el evento estándar <code>Lead</code> (o <code>CompleteRegistration</code>) al enviar el formulario de "solicitar demo".</div>
+    </div>
+  </div>
+
+  <div class="section-title">✍️ Reescrituras sugeridas</div>
+
+  <div class="card">
+    <h3>3 headlines alternativos</h3>
+    <div class="rewrite-box"><div class="old">"La solución completa para digitalizar tu restaurante. Gestiona mesas, pedidos y ventas en tiempo real."</div><div class="new">1. "Atiende más mesas con menos personal. El sistema que digitaliza tu restaurante sin apps para tus clientes."</div></div>
+    <div class="rewrite-box"><div class="new">2. "Cero comandas perdidas. Pedidos, mesas y ventas de tu restaurante, en un solo panel."</div></div>
+    <div class="rewrite-box"><div class="new">3. "Tu restaurante, más rápido y sin errores. Pedidos por QR, cobro y control de ventas en tiempo real."</div></div>
+
+    <h3 style="margin-top:20px;">CTA principal alternativo</h3>
+    <div class="rewrite-box"><div class="old">"Comenzar ahora"</div><div class="new">"Quiero mi demo gratis de 15 min"</div></div>
+
+    <h3 style="margin-top:20px;">Copy mejorado — sección de características</h3>
+    <div class="rewrite-box"><div class="old">"Alertas en Tiempo Real: Notificaciones instantáneas de pedidos."</div><div class="new">"Cero pedidos olvidados. En cuanto un cliente hace su pedido por QR, cocina lo recibe al instante — sin gritos, sin tickets de papel perdidos."</div></div>
+    <div class="rewrite-box"><div class="old">"Reportes de Ventas: Análisis por períodos con gráficos."</div><div class="new">"Sabe qué platos te dan de comer de verdad. Reportes de ventas por día, semana y mes, sin abrir una hoja de cálculo."</div></div>
+  </div>
+
+  <div class="section-title">📐 Checklist de implementación</div>
+  <div class="section-sub">Ordenado por impacto — hazlo en este orden</div>
+  <div class="card">
+    <div class="checklist-item">
+      <div class="checklist-num">1</div>
+      <div class="checklist-body"><strong>Instalar Meta Pixel + evento Lead</strong><p>Sin esto, cualquier euro invertido en ads es imposible de optimizar o medir.</p></div>
+      <div class="checklist-meta"><span class="tag tag-rojo">Impacto alto</span><span class="tag tag-azul">30 min</span></div>
+    </div>
+    <div class="checklist-item">
+      <div class="checklist-num">2</div>
+      <div class="checklist-body"><strong>Crear un único CTA de captación ("Pide tu demo gratis") y un formulario corto (nombre, restaurante, teléfono)</strong><p>Hoy no existe una vía de conversión clara para alguien que no te conoce.</p></div>
+      <div class="checklist-meta"><span class="tag tag-rojo">Impacto alto</span><span class="tag tag-azul">2-3 h</span></div>
+    </div>
+    <div class="checklist-item">
+      <div class="checklist-num">3</div>
+      <div class="checklist-body"><strong>Añadir 3 testimonios reales con nombre, restaurante y una cifra de resultado</strong><p>Sin prueba social, un dueño de restaurante escéptico no da el paso de cambiar de sistema.</p></div>
+      <div class="checklist-meta"><span class="tag tag-rojo">Impacto alto</span><span class="tag tag-azul">1-2 días</span></div>
+    </div>
+    <div class="checklist-item">
+      <div class="checklist-num">4</div>
+      <div class="checklist-body"><strong>Reescribir el headline y las características con beneficio + cifra, no solo función</strong><p>Usa las reescrituras propuestas arriba como base.</p></div>
+      <div class="checklist-meta"><span class="tag tag-amarillo">Impacto medio</span><span class="tag tag-azul">2-3 h</span></div>
+    </div>
+    <div class="checklist-item">
+      <div class="checklist-num">5</div>
+      <div class="checklist-body"><strong>Añadir sección de FAQ / objeciones (integración con TPV, curva de aprendizaje, qué pasa sin internet, precio)</strong><p>Resuelve las dudas que hoy solo se resuelven llamando o abandonando la página.</p></div>
+      <div class="checklist-meta"><span class="tag tag-amarillo">Impacto medio</span><span class="tag tag-azul">2-3 h</span></div>
+    </div>
+    <div class="checklist-item">
+      <div class="checklist-num">6</div>
+      <div class="checklist-body"><strong>Añadir garantía o reducción de riesgo ("14 días gratis, sin tarjeta")</strong><p>Baja la barrera psicológica de probar un software nuevo en el negocio.</p></div>
+      <div class="checklist-meta"><span class="tag tag-amarillo">Impacto medio</span><span class="tag tag-azul">1 h</span></div>
+    </div>
+    <div class="checklist-item">
+      <div class="checklist-num">7</div>
+      <div class="checklist-body"><strong>Reducir a un único CTA principal repetido, moviendo "Ya tengo cuenta" a enlace secundario</strong><p>Evita que el visitante de un anuncio dude entre 4 botones distintos.</p></div>
+      <div class="checklist-meta"><span class="tag tag-verde">Impacto bajo</span><span class="tag tag-azul">30 min</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">📊 Benchmarks del sector — B2B SaaS</div>
+  <div class="section-sub">Referencia orientativa para cuando lances campaña (no tienes datos de rendimiento propios aún)</div>
+  <div class="card">
+    <table>
+      <tr><th>Métrica</th><th>Media B2B SaaS</th><th>Bueno</th><th>Excelente</th></tr>
+      <tr><td>CTR (link click)</td><td class="num">0.8 – 1.2%</td><td class="num above">1.2 – 2%</td><td class="num above">&gt;2%</td></tr>
+      <tr><td>CPC</td><td class="num">1.50 – 3€</td><td class="num above">&lt;1.50€</td><td class="num above">&lt;1€</td></tr>
+      <tr><td>CPM</td><td class="num">10 – 18€</td><td class="num above">&lt;10€</td><td class="num above">&lt;7€</td></tr>
+      <tr><td>Coste por lead (CPL)</td><td class="num">15 – 40€</td><td class="num above">&lt;15€</td><td class="num above">&lt;8€</td></tr>
+      <tr><td>Tasa de conversión landing</td><td class="num">2 – 4%</td><td class="num above">4 – 8%</td><td class="num above">&gt;8%</td></tr>
+    </table>
+    <p style="font-size:12px; color:var(--texto-suave); margin-top:12px;">B2B SaaS suele tener CTR más bajo y CPL más alto que e-commerce porque el ciclo de decisión es más largo. Con la landing corregida (prueba social + CTA claro + pixel), es razonable apuntar a estar en el rango "bueno" desde las primeras semanas.</p>
+  </div>
+
+  <div class="section-title">🚀 Pack de anuncios listos para lanzar</div>
+  <div class="section-sub">5 anuncios completos, con ángulos distintos, para copiar y pegar en el Ads Manager una vez apliques las correcciones de landing</div>
+
+  <div class="ad-card">
+    <div class="angle">Ángulo — Resultado</div>
+    <div class="hook">¿Cuántas comandas se te pierden en hora punta?</div>
+    <div class="copy">Con GastroFlow, cero pedidos olvidados: tu cliente pide por QR desde la mesa, cocina lo recibe al instante y tú ves en tiempo real qué mesas están listas para cobrar.
+
+Sin apps que tus clientes tengan que descargar. Sin tickets de papel que se pierden.
+
+Prueba GastroFlow gratis 30 días.</div>
+    <div class="ad-field"><b>Headline</b><span>Cero comandas perdidas en tu restaurante</span></div>
+    <div class="ad-field"><b>Descripción</b><span>Pedidos por QR, cocina y caja conectadas en tiempo real</span></div>
+    <div class="ad-field"><b>CTA</b><span>Solicitar demo</span></div>
+    <div class="ad-field"><b>Formato</b><span>Vídeo corto (15-20s)</span></div>
+    <div class="briefing"><strong>Briefing creativo:</strong> Grabación real (no stock) de un camarero escaneando el QR en mesa y, corte a cocina, la comanda apareciendo al instante en una tablet o pantalla. Cerrar con el panel de ventas en tiempo real.</div>
+  </div>
+
+  <div class="ad-card">
+    <div class="angle">Ángulo — Problema</div>
+    <div class="hook">¿Cansado de gestionar tu restaurante con papel y voz alta?</div>
+    <div class="copy">Comandas a mano, gritos de cocina a sala, cierre de caja a las 2am con la calculadora. Así se pierden mesas, tiempo y dinero cada noche.
+
+GastroFlow digitaliza pedidos, mesas y ventas en un solo panel — sin que tus clientes descarguen nada.
+
+Empieza gratis, sin compromiso.</div>
+    <div class="ad-field"><b>Headline</b><span>Deja el papel. Gestiona tu restaurante desde un panel</span></div>
+    <div class="ad-field"><b>Descripción</b><span>30 días gratis, sin tarjeta, cancela cuando quieras</span></div>
+    <div class="ad-field"><b>CTA</b><span>Más información</span></div>
+    <div class="ad-field"><b>Formato</b><span>Carrusel (3 tarjetas: problema → producto → panel de control)</span></div>
+    <div class="briefing"><strong>Briefing creativo:</strong> Tarjeta 1: foto real de comandas en papel arrugadas. Tarjeta 2: captura del menú QR desde el móvil de un cliente. Tarjeta 3: captura del dashboard de GastroFlow con mesas y ventas.</div>
+  </div>
+
+  <div class="ad-card">
+    <div class="angle">Ángulo — Prueba social</div>
+    <div class="hook">Más de X restaurantes ya gestionan su día a día con GastroFlow</div>
+    <div class="copy">De comandas en papel a un panel en tiempo real: así de simple es el cambio que ya han hecho decenas de restaurantes.
+
+Pedidos por QR, alertas instantáneas a cocina y reportes de ventas sin abrir una hoja de cálculo.
+
+Únete gratis 14 días.</div>
+    <div class="ad-field"><b>Headline</b><span>El sistema que ya usan restaurantes como el tuyo</span></div>
+    <div class="ad-field"><b>Descripción</b><span>Prueba GastroFlow gratis, sin tarjeta de crédito</span></div>
+    <div class="ad-field"><b>CTA</b><span>Registrarse</span></div>
+    <div class="ad-field"><b>Formato</b><span>Imagen única</span></div>
+    <div class="briefing"><strong>Briefing creativo:</strong> Foto real de un restaurante cliente (con permiso) con overlay de texto pequeño con el resultado obtenido. Sustituye la "X" por tu número real de restaurantes activos — no lances este anuncio hasta tener testimonios reales que respalden la promesa.</div>
+  </div>
+
+  <div class="ad-card">
+    <div class="angle">Ángulo — Curiosidad</div>
+    <div class="hook">El detalle que separa a un restaurante lleno de uno rentable</div>
+    <div class="copy">No es solo tener mesas ocupadas. Es saber qué platos venden de verdad, cuánto tarda cada mesa en rotar y dónde se te escapan pedidos.
+
+GastroFlow te lo enseña todo en un panel, en tiempo real.
+
+Descúbrelo gratis 30 días.</div>
+    <div class="ad-field"><b>Headline</b><span>¿Sabes qué platos te dan de comer de verdad?</span></div>
+    <div class="ad-field"><b>Descripción</b><span>Reportes de ventas claros, sin hojas de cálculo</span></div>
+    <div class="ad-field"><b>CTA</b><span>Solicitar demo</span></div>
+    <div class="ad-field"><b>Formato</b><span>Vídeo (screen recording del panel de reportes)</span></div>
+    <div class="briefing"><strong>Briefing creativo:</strong> Grabación de pantalla del dashboard de reportes de GastroFlow, con zoom en el gráfico de ventas por plato/período. Voz en off o texto sobreimpreso explicando el dato en 3 segundos.</div>
+  </div>
+
+  <div class="ad-card">
+    <div class="angle">Ángulo — Contraste (antes/ahora)</div>
+    <div class="hook">Antes: comandas a voces y cierre de caja a mano. Ahora: todo en un panel.</div>
+    <div class="copy">Así cambia el día a día de un restaurante con GastroFlow:
+
+Antes → pedidos anotados a mano, errores en cocina, cierre de caja tarde y a ciegas.
+Ahora → pedidos por QR, alertas instantáneas, ventas y mesas controladas en tiempo real desde el móvil.
+
+Prueba el cambio gratis 30 días.</div>
+    <div class="ad-field"><b>Headline</b><span>De la comanda en papel al panel en tiempo real</span></div>
+    <div class="ad-field"><b>Descripción</b><span>Sin apps para tus clientes. Sin tarjeta para probar.</span></div>
+    <div class="ad-field"><b>CTA</b><span>Más información</span></div>
+    <div class="ad-field"><b>Formato</b><span>Carrusel dividido (izquierda "antes" / derecha "ahora")</span></div>
+    <div class="briefing"><strong>Briefing creativo:</strong> Imagen dividida en dos mitades: izquierda en tonos apagados con comandas de papel y caos de cocina; derecha en tonos vivos con el panel de GastroFlow limpio y ordenado.</div>
+  </div>
+
+  <div class="card" style="background:#eff6ff; border-color:#bfdbfe;">
+    <h2>✅ Resumen — próximos pasos</h2>
+    <p style="font-size:14px; margin-bottom:10px;"><strong>1.</strong> Instala el Pixel de Meta y el evento Lead (bloqueante).</p>
+    <p style="font-size:14px; margin-bottom:10px;"><strong>2.</strong> Aplica las correcciones de la landing en orden de impacto (checklist arriba).</p>
+    <p style="font-size:14px; margin-bottom:10px;"><strong>3.</strong> Lanza con 2-3 de los 5 anuncios del pack, testando ángulos distintos.</p>
+    <p style="font-size:14px;"><strong>4.</strong> En cuanto tengas datos de la campaña (CTR, CPC, conversión), vuelve y te hago la auditoría de coherencia ad↔landing con datos reales.</p>
+  </div>
+
+</div>
+
+<footer>Auditoría generada — GastroFlow Solutions · gastroflowsolutions.com</footer>
+
+</body>
+</html>
